@@ -1,0 +1,1 @@
+{"user_last_score": 0, "result": 40002}

@@ -1,0 +1,312 @@
+<html>
+<head>
+<title>精品推荐</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable = no">
+<link rel="stylesheet" href="http://book.duokan.com/store/v0/ios/www/static/iphone.css">
+<script language="javascript" src="js/libs/jquery-1.7.2.min.js"></script>
+<script language="javascript" src="http://book.duokan.com/store/v0/ios/www/static/ios_support.js"></script>
+</head>
+<body>
+<!---上方循环展示条--->
+<div id="s_scroll">
+  <div id="s_wrapper"> </div>
+  <div id="s_bar">
+    <center>
+    </center>
+  </div>
+</div>
+<!---下方图书列表--->
+<ul class="book_list initial_hide">
+  <li id="inside_loading1"> <span>点击获取更多...</span>
+    <div class='spin'>&nbsp;</div>
+  </li> 
+</ul>
+<div class='no_result' style='display:none'>暂无数据，请稍候再试！</div>
+<script language="javascript">
+var start = 0; // 开始图书项
+var slide = null;
+var build = getCookie('build');
+if (build == null) build = getArgs('build');
+var device = getCookie('device');
+if (device == null) device = getArgs('device');
+
+function hideAll() {
+  $('#s_scroll').hide();
+  $('.book_list').hide();
+  $('.no_result').show();
+}
+
+function changeStauts(book_id, status, content_type) {
+  if (content_type == 'full') {
+    var p = $('.book_list li[book_id="' + book_id + '"]');
+    if (p.size() > 0) {
+      p.find('.s_price').attr('status', '').attr('free', '');
+      p.find('.s_price p:nth-child(2)').html('');
+      
+      if (status == 'notstarted') {
+        p.find('.s_price p:nth-child(1)').html('已购买');
+      } else if (status == 'downloading') {
+        p.find('.s_price').attr('status','downloading').find('p:nth-child(1)').html('下载中');
+      } else if (status == 'downloaded') {
+        p.find('.s_price').attr('status','downloaded').find('p:nth-child(1)').html('已下载');
+      } else if (status == 'update') {
+        p.find('.s_price p:nth-child(1)').html('有更新');
+      }
+    }
+  }
+}
+function refreshStatus() {
+  //$.getJSON('/__duokan_appapi/data/books/purchased', function(data) {
+  //    for (var i in data) {
+  //      changeStauts(data[i].book_id, data[i].status, data[i].contenttype);
+  //    }
+  // });
+}
+
+function appendEmptySlot() {
+  $('.empty').remove();
+  
+  // 撑满默认版面，注意必须小于每次加载的单元数量
+  empty_li = "";
+  count = 3 - $('.book_list li:visible').size();
+  
+  for (var i = 0; i < count; i++)
+    empty_li += "<li class='empty'></li>";
+  $('#inside_loading1').before(empty_li);
+}
+
+function buildBook(book) {
+  var li = "<li book_id=" + book.book_id + " >"
+    + "<img class=s_cover _src=" + book.cover + " />"
+    + "<p class=s_title>" + book.title + "</p>"
+   if ((book.authors == null || book.authors == ""||book.authors == undefined ) && (book.editors == null || book.editors == ""|| book.editors ==  undefined)){
+      li += "<p class=s_author>作者：未知</p>";
+    } else if (book.authors == null || book.authors == ""||book.authors == undefined){
+      li += "<p class=s_author>编者："+book.editors+"</p>";
+    } else if(book.authors != null &&book.authors != ""&&book.authors != undefined){
+      li += "<p class=s_author>作者：" + book.authors + "</p>"; 
+    }
+    li+= "<p class=s_abst>" + book.summary + "</p>"
+    li+= "<div class=arrow></div>";
+  if (book.hasOwnProperty('new_price')) {
+    if (book.new_price == 0) {
+      li += "<div class=s_price status=discount free=yes><p>免费</p><p>￥"
+        + book.price.toFixed(2) + "</p></div>";
+    } else {
+      li += "<div class=s_price status=discount><p>￥" + book.new_price.toFixed(2)
+        + "</p><p>￥" + book.price.toFixed(2) + "</p></div>";
+    }
+  } else if (book.price == 0) {
+    li += "<div class=s_price free=yes><p>免费</p></div>";
+  } else {
+    li += "<div class=s_price><p>￥" + book.price.toFixed(2) + "</p></div>";
+  }
+  
+  li = $(li);
+  li.click(function () {
+      document.location = 'http://192.168.1.112:8000/detail.html';
+    //alert(navigateTo);
+    //navigateTo('http://192.168.1.112:8000/detail.html');
+  });
+  
+  return li;
+}
+function buildList(list) {
+  var li = "<li list_id=" + list.list_id + " >"
+    + "<img class=s_cover _src=" + list.cover + " />"
+    + "<p class=s_l_name>" + list.label  + "</p>"
+    + "<p class=s_ts>" + list.description + "</p>"
+    + "<p class=s_time>创建时间：" + list.updated + "</p>"
+    + "<div class=arrow></div>"
+    + "<img src='static/zhuanti.png' class=special_list />";
+  
+  if (list.weight > 10000) {
+    // 权重大于10000认为是重点推荐
+    li += "<div class=s_hot>热<span class=top></span></div>";
+  } else {
+    var now = new Date();
+    if(now.getTime()-parseDate(list.updated) < 259200000) {
+      // 3天内
+      li += "<div class=s_new>新<span class=top></span></div>";
+    }
+  }
+  
+  li += "</li>";
+  
+  li = $(li);
+  li.click(function () {
+    navigateTo(iphoneListURL(list.list_id, list.label));
+  });
+  
+  return li;
+}
+
+function getItems(data) {
+  if (!data.hasOwnProperty('result') || !data.hasOwnProperty('count')
+    || !data.hasOwnProperty('items') || !data.hasOwnProperty('v')
+    || data.v != 0)
+    handleError(status.UNEXPECTED_ERROR, hideAll);
+  else {
+      if (data.result == Status.OK) {
+      var content = "";
+      for (var i=0; i<data.count; i++) {
+        item = data.items[i];
+        if (item.hasOwnProperty('book_id'))
+          content = buildBook(item);
+        else
+          content = buildList(item);
+        content.insertBefore('#inside_loading1');
+        setHover(content);
+      }
+      start += data.count;
+      $('#inside_loading1').hide();
+      if ($('.book_list li').size() == 1) {
+        hideAll();
+      } else {
+        $('.book_list').removeClass('initial_hide');
+        appendEmptySlot();
+        refreshStatus();
+        lazyLoadImage('img[_src]');
+      }
+    } else {
+      handleError(data.result, hideAll);
+    }
+  }
+
+}
+
+function getBanner(data){ //生成banner;
+  if (!data.hasOwnProperty('ads') || !data.hasOwnProperty('count')|| !data.hasOwnProperty('code') ){handleError(status.UNEXPECTED_ERROR, function re (){return flase});}
+  else if(data.code == 0){ 
+    if(data.count<=0){
+      return false
+    };
+    var count = data.count < 6 ? data.count :6;
+    var banner_box=$("<div class='zt_banner'></div>")
+    for(var i=0;i<count; i++){
+      var c,b;
+      c=$('<a><img/></a>');
+      c.find('img').attr('src',data.ads[i].ad_pic_url);
+      var f = (function (ad) {
+        return function () {
+          if (ad.ad_type == 1) {
+            navigateTo(iphoneBookURL(ad.reference_id));
+          } 
+         else if (ad.ad_type == 2) {
+           navigateTo(iphoneListURL(ad.reference_id));
+         }
+         else if (ad.ad_type == 3) {
+           navigateTo(ad.reference_id);
+         }
+       }
+      })(data.ads[i]);
+      c.click(f);
+      banner_box.append(c);
+      if($('.book_list').has('li').not('.inside_loading1')){
+        $('.book_list').after(banner_box);
+      }
+    }
+  }
+}
+
+function getAds(data) {
+  if (data.hasOwnProperty('code') && data.code == 0 && data.hasOwnProperty('count') && data.count > 0) {
+	 
+    var count = data.count < 6 ? data.count : 5;
+    $('#s_wrapper').css('width', count+'00%');
+    
+    for (var i = 0; i < count; i++) {
+      var s, b;
+      s = $("<img />");
+      s.attr('_src', data.ads[i].ad_pic_url);
+      
+      var f = (function (ad) {
+        return function () {
+          if (ad.ad_type == 1) {
+            navigateTo(iphoneBookURL(ad.reference_id));
+          } else if (ad.ad_type == 2) {
+            navigateTo(iphoneListURL(ad.reference_id));
+          } else if (ad.ad_type == 3) {
+            navigateTo(ad.reference_id);
+          }
+        }
+      })(data.ads[i]);
+      
+      s.click(f);
+      
+      if (count != 1) {
+        if (i == 0)
+          b = "<div class=circle active=yes></div>";
+        else
+          b = "<div class=circle></div>";
+      }
+      
+      $('#s_wrapper').append(s);
+      $('#s_bar center').append(b);
+    }
+    
+    $('#s_wrapper img').eq(0).load(function() {
+      if (count != 1) {
+        slide =bindTouchScroll('#s_wrapper img', function (index) {
+          $('#s_bar div').removeAttr('active');
+          $('#s_bar div').eq(index).attr('active', 'yes');
+        }, 7000);
+      }
+    });
+  
+    lazyLoadImage('img[_src]');
+  }
+  
+}
+
+// api
+function dkSetLayout(direct) {
+  // do nothing
+}
+function dkWillShowPage() {
+  refreshStatus();
+  if (slide != null)
+    slide.start();
+}
+function dkWillHidePage () {
+  if (slide != null)
+    slide.stop();
+}
+function dkGetBgColor() {
+  return '[204,204,204]';
+}
+
+$(document).ready(function () {
+ $('body').ajaxError(function () {
+    hideAll();
+  }); 
+		
+  $.ajax({
+    url: 'js/data/recommend.js',
+    success: getItems,
+    dataType: 'json',
+    complete: function () {
+ 	setTimeout(notifyAppLoaded, 100);
+    }
+  });
+  
+     $.ajax({
+    url: 'js/data/main.js',
+    success: getAds,
+    dataType: 'json'
+  });
+   
+  $.ajax({              
+    url:'js/data/iphone.js',
+    success: getBanner,
+    dataType: 'json'
+  });//获取广告json;
+  
+ 
+
+});
+</script>
+</body>
+</html>

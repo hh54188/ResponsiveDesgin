@@ -1,0 +1,52 @@
+<html>
+	<head>
+		<title>测试页</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable = no">
+		<style type="text/css">
+			* { margin: 0; padding: 0;}
+			li { height: 100px;}
+			li:nth-child(2n+1){ background: #EBEFF0;}
+			li:nth-child(2n){ background: #E3E8EA;}
+
+			li.click {
+				background: red;
+			}
+		</style>
+	</head>
+	<body>
+		<ul>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+		<script language="javascript" src="js/libs/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript">
+			$(function () {
+				$('li').toggle(function () {
+					$(this).addClass('click');
+				}, function () {
+					$(this).removeClass('click');
+				})
+
+				// $('li').bind('touchstart', function () {
+				// 	$(this).addClass('click');
+				// })
+
+				// $('li').bind('touchend', function () {
+				// 	$(this).removeClass('click');
+				// })
+			})
+		</script>
+	</body>
+</html>

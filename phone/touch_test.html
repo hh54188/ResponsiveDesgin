@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<title>Touch Test</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable = no">
+		
+	</head>
+	<body>
+		<script language="javascript" src="js/libs/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript">
+			var log = function (prop) {
+				var temp = "<span>" + prop + "</span><br>";
+				$('body').append(temp);
+			}
+			$(function () {
+				var flag = 0;
+				var start_timeStamp;
+				var end_timeStamp;
+				$(document).bind('touchstart', function (e) {
+					// if (!flag) {
+					// 	var type = "event type is: " + e.type;
+					// 	log(type);
+
+					// 	var target = "event target is: " + e.target;
+					// 	log(target);
+
+					// 	start_timeStamp = e.timeStamp;
+					// 	log("start event timeStamp is: " + e.timeStamp);
+					// }
+				}).bind('touchend', function (e) {
+					// if (!flag) {
+					// 	end_timeStamp = e.timeStamp;
+					// 	log("end event timeStamp is: " + e.timeStamp);
+
+					// 	var diff = parseInt(end_timeStamp) - parseInt(start_timeStamp);
+					// 	log(diff);
+
+					// 	flag = 1;						
+					// }
+
+				}).bind('touchmove', function (e) {
+					if (!flag) {
+						for (var obj in e) {
+							log(obj);
+						}						
+						flag = 1;
+					}
+
+				})
+			})
+		</script>		
+	</body>
+</html>

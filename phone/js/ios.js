@@ -82,7 +82,7 @@ function getTouches(event) {
     if (event.touches)
         return event.touches;
     else
-        return event.originalEvent.touches;
+        return event.originalEvent.touches;//???
     
     return undefined;
 }
@@ -195,7 +195,7 @@ function slide(sildes, buttons, highlighter, time) {
         }
     }
     this.adjustHighlighter = function () {
-        l = $(buttons).eq(slide_index).position().left;
+        l = $(buttons).eq(slide_index).position().left;//???
         translateX($(highlighter), l);
     }
 }
@@ -207,8 +207,8 @@ function bindTouchScroll(item, end_callback, time) {
     var s_t = 0;
     var c_step = 0; // 当前展示的第几幅图片
     var touch_count = 0;
-    var step_width = ele.eq(0).width();
-    var step_count = ele.size();
+    var step_width = ele.eq(0).width();//???
+    var step_count = ele.size();//???
     var act = false;
     var is_new_touch = true;
     var interval = null;
@@ -243,7 +243,7 @@ function bindTouchScroll(item, end_callback, time) {
         if (touch_count == 0) {
             s_x = x = touches[0].clientX;
             s_y = touches[0].clientY;
-            s_t = (new Date()).getTime();
+            s_t = (new Date()).getTime();//???
             removeTransition(ele);
             act = false;
             is_new_touch = true;
@@ -810,7 +810,3 @@ function returnpage(){
 
   })
 })(jQuery)
-
-
-
-ß
